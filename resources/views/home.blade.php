@@ -38,33 +38,26 @@
                     <table class="table table-striped table-inverse table-responsive">
                         <thead class="thead-inverse">
                             <tr>
-                                <th scope="col"></th>
-                                <th scope="col">Name</th>
+                                <th scope="col-1"></th>
+                                <th scope="col-3">Name</th>
                                 <th scope="col">Address</th>
-                                <th scope="col">Contact Phone</th>
-                                <th scope="col">Contact Mobile</th>
+                                <th scope="col">Phone</th>
+                                <th scope="col">Mobile</th>
                                 <th scope="col">Email</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td scope="row"></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td scope="row"></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                @foreach ($imports as $aImport)
+                                    <td scope="row"></td>
+                                    <td>$aImport->first_name</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                @endforeach
                             </tr>
                         </tbody>
                     </table>
