@@ -5,14 +5,26 @@ namespace App\Services;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Services\BaseService;
 
 /**
  * ImportService
  */
-class ImportService
+class ImportService extends BaseService
 {    
     /**
-     * importFile
+     * Fetch the 10 rows of the current page for table of the home page
+     *
+     * @param  mixed $aPageDetails
+     * @return array
+     */
+    public function getImports(array $aPageDetails): array
+    {
+        return $this->getDataByUserDetails($aPageDetails);
+    }
+
+    /**
+     * Imports the file to the database
      *
      * @param  array $aFile
      * @return array
@@ -39,7 +51,7 @@ class ImportService
                 DB::table('import')->insert($rowData);
             }
             return [
-                'message' => 'Successfully add data',
+                'message' => 'File uploaded successfully.',
                 'status' => 201
             ];
         } catch (\Exception $oException) {
@@ -51,26 +63,5 @@ class ImportService
             ];
         }
         
-    }
-
-    public function getImports(array $aPageDetails): array
-    {
-        try {
-            $iOffset = ((int)$aPageDetails['page'] - 1) * (int)$aPageDetails['limit']; // Calculate offset
-
-            $aImports = DB::table('import')
-                ->skip($iOffset)
-                ->take($aPageDetails['limit'])
-                ->get()
-                ->toArray();
-            return $aImports;
-        } catch (\Throwable $oException) {
-            // handle any exceptions that may occur in importFile
-            return [
-                'message' => 'Failed to get data.',
-                'error' => $oException->getMessage(),
-                'status' => 500
-            ];
-        }
     }
 }
