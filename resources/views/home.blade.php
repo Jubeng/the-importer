@@ -1,7 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $page = (int)$page;
+    $totalPage = $count / 10;
+@endphp
 <div class="container">
+    @if ($jobs === true)
+        <div class="modal-backdrop fade show"></div>
+        <!-- Modal -->
+        <div class="modal fade show" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-modal="true" role="dialog" style="display: block;">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                            Importing data...
+                        </h1>
+                    </div>
+                    <div class="modal-body">
+                        <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 75%;"></div>
+                        </div>
+                        Please wait before importing again, thank you... 
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+    
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
@@ -14,14 +40,14 @@
                         </div>
                     @endif
                     @if($errors->any())
-                            <div class="alert alert-danger">
-                                <ul class="{{ $errors->count() === 1 ? ' mb-0' : '' }}">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <div class="row">
                         <div class="col">
                             <div class="card">
@@ -103,6 +129,25 @@
                             @endforeach
                         </tbody>
                     </table>
+                    @if($count > 10)
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item {{(($page  - 10) <= 0 ? 'disabled' : '')}}">
+                                    <a class="page-link" href="{{ route('home', [
+                                            'page' => ($page - 10) <= 1 ? 1 : $page - 10
+                                        ]) }}"><<</a>
+                                </li>
+                                @for ($iCounter = ($page >= 6 ? ($page - 4) : 1); $iCounter <= $totalPage; $iCounter++)
+                                    @if ($iCounter <= ($page < 6 ? 10 : $page + 5))
+                                        <li class="page-item"><a class="page-link {{ $page === $iCounter ? 'active' : ''}}" href="{{ route('home', ['page' => $iCounter])}}">{{ $iCounter }}</a></li>
+                                    @endif
+                                @endfor
+                                <li class="page-item {{(($page + 10) >= $totalPage ? 'disabled' : '')}}">
+                                    <a class="page-link" href="{{ route('home', ['page' => ($page + 10) >= $totalPage ? $totalPage : $page + 10])}}">>></a>
+                                </li>
+                            </ul>
+                        </nav>
+                    @endif
                 </div>
             </div>
         </div>

@@ -43,12 +43,9 @@ class ImportController extends Controller
         // Get the uploaded file
         $oFile = $oRequest->file('import_file');
         
-        $oImportResponse = $this->oImportService->importFile([
+        return $this->oImportService->importFile([
             'import_file' => $oFile,
             'user_id'     => $oRequest->get('user_id')
         ]);
-
-        // Redirect back with a success message
-        return back()->with('success', $oImportResponse['message']);
     }
 }

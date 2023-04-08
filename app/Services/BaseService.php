@@ -35,7 +35,7 @@ class BaseService
                 'contact_mobile',
                 'email'
             ];
-            // dd($aPageDetails);
+
             if (isset($aPageDetails['export_type']) === true) {
                 if ($aPageDetails['export_type'] === 'all') {
                     $sAdditionalQuery = '';
@@ -61,5 +61,25 @@ class BaseService
                 'status' => 500
             ];
         }
+    }
+
+    /**
+     * Get the count of data based on user_id
+     *
+     * @param string $sUserId
+     * @return integer | array
+     */
+    protected function getAllDataCountByUserId(string $sUserId): int | array
+    {
+        try {
+            return DB::select('SELECT COUNT(*) FROM import WHERE user_id = ?', [$sUserId])[0]->{'COUNT(*)'};
+        } catch (\Exception $oException) {
+            return [
+                'message' => 'Error occurred when getting the count of data.',
+                'error' => $oException->getMessage(),
+                'status' => 500
+            ];
+        }
+        
     }
 }
