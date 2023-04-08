@@ -13,6 +13,6 @@ class ImportSeeder extends Seeder
      */
     public function run(): void
     {
-        ImportModel::factory(100)->create();
+        ImportModel::factory(900)->create();
     }
 }

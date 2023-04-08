@@ -40,31 +40,15 @@ class ImportController extends Controller
      */
     public function importFile(ImportFileRequest $oRequest)
     {
-        try {
-            // Get the uploaded file
-            $oFile = $oRequest->file('import_file');
-
-            // Process the file with spatie/simple-excel
-            
-            $this->oImportService->importFile(['import_file' => $oFile]);
-
-            // Redirect back with a success message
-            return back()->with('success', 'File uploaded and data inserted successfully.');
-        } catch (Exception $oError) {
-            Log::error($oError);
-        }
-    }
+        // Get the uploaded file
+        $oFile = $oRequest->file('import_file');
         
-    /**
-     * fetch the imports with limit of 10
-     *
-     * @return \Illuminate\View\View
-     */ 
-    public function getImport(): View
-    {
-        $aImports = $this->oImportService->getImports();
-        return view('home', [
-            'imports' => $aImports
+        $oImportResponse = $this->oImportService->importFile([
+            'import_file' => $oFile,
+            'user_id'     => $oRequest->get('user_id')
         ]);
+
+        // Redirect back with a success message
+        return back()->with('success', $oImportResponse['message']);
     }
 }

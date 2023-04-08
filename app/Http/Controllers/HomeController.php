@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Services\ImportService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
+/**
+ * HomeController
+ */
 class HomeController extends Controller
 {
     /**
@@ -35,14 +39,16 @@ class HomeController extends Controller
     {
         $aPageDetails = [
             'page' => 1,
-            'limit' => 10
+            'limit' => 10,
+            'user_id' => Auth::user()->id
         ];
         if ($oRequest->has('page') && $oRequest->has('limit')) {
             $aPageDetails['page'] = $oRequest->input('page');
             $aPageDetails['limit'] = $oRequest->input('limit');
         }
-
+        // dd($aPageDetails);
         $aImports = $this->oImportService->getImports($aPageDetails);
+
         return view('home', [
             'imports' => $aImports
         ]);
