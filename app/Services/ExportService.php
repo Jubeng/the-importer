@@ -47,21 +47,14 @@ class ExportService extends BaseService
                 'Contact Mobile',
                 'Email'
             ];
-            $oSheet->fromArray([$aHeaders], null, 'A1'); // Add headers to row 1
-            $oSheet->getStyle('A1:J1')->getFont()->setBold(true); // Format headers in bold
-            $oSheet->getStyle('B2:B'.($oSheet->getHighestRow()))->getNumberFormat()->setFormatCode('0'); // Format contact_mobile column as number
-            // Create a new instance of the Xlsx writer and save the spreadsheet to a file
+            $oSheet->fromArray([$aHeaders], null, 'A1');
+            $oSheet->getStyle('A1:J1')->getFont()->setBold(true);
+
             $oWriter = new Xlsx($oSpreadsheet);
             $iTimestamp = time();
             $sFileName = 'TheImporter' . date('YmdHis', $iTimestamp) . '.xlsx';
             $oWriter->save($sFileName);
-            // dd($sFileName);
-            // Download the file
-            // Create a response to download the file
-            // Store the file path in the session
-            // session(['file_path' => $sFileName]);
-            // Redirect to the download route
-            // return redirect()->route('download');
+
             return [
                 'file_name' => $sFileName,
                 'status' => 200
@@ -74,25 +67,5 @@ class ExportService extends BaseService
                 'status' => 500
             ];
         }
-    }
-
-    /**
-     * Get the count of data based on user_id
-     *
-     * @param string $sUserId
-     * @return integer | array
-     */
-    private function getAllDataCountByUserId(string $sUserId): int | array
-    {
-        try {
-            return DB::select('SELECT COUNT(*) FROM import WHERE user_id = ?', [$sUserId])[0]->{'COUNT(*)'};
-        } catch (\Exception $oException) {
-            return [
-                'message' => 'Error occurred when getting the count of data.',
-                'error' => $oException->getMessage(),
-                'status' => 500
-            ];
-        }
-        
     }
 }

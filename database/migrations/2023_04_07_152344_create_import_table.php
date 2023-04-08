@@ -24,7 +24,8 @@ return new class extends Migration
             $table->string('contact_phone', 15)->nullable();
             $table->string('contact_mobile', 15);
             $table->string('email', 255)->unique();
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

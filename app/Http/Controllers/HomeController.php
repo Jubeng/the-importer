@@ -42,15 +42,13 @@ class HomeController extends Controller
             'limit' => 10,
             'user_id' => Auth::user()->id
         ];
-        if ($oRequest->has('page') && $oRequest->has('limit')) {
+        if ($oRequest->has('page')) {
             $aPageDetails['page'] = $oRequest->input('page');
-            $aPageDetails['limit'] = $oRequest->input('limit');
         }
-        // dd($aPageDetails);
-        $aImports = $this->oImportService->getImports($aPageDetails);
 
-        return view('home', [
-            'imports' => $aImports
-        ]);
+        $aImports = $this->oImportService->getImports($aPageDetails);
+        $aImports['page'] = $aPageDetails['page'];
+        $aImports['jobs'] = false;//DB::table('jobs')->where('payload', 'like', '%'. Auth::user()->id .'%')->get();
+        return view('home', $aImports);
     }
 }
