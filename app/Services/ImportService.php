@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Jobs\ProcessImport;
 use App\Services\BaseService;
+use Illuminate\Bus\Batch;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -56,17 +58,18 @@ class ImportService extends BaseService
             if ($mValidatorResponse !== true) {
                 return $mValidatorResponse;
             }
-            $this->dispatchImports($aImportedData);
+            $oBatch = $this->dispatchImports($aImportedData);
             return [
-                'message' => 'File successfully imported.',
-                'status' => 200
+                'message'  => 'Importing...',
+                'batch_id' => $oBatch->id,
+                'status'   => 200
             ];
         } catch (\Exception $oException) {
             // handle any exceptions that may occur in importFile
             return [
                 'message' => 'Failed to add data.',
-                'error' => $oException->getMessage(),
-                'status' => 500
+                'error'   => $oException->getMessage(),
+                'status'  => 500
             ];
         }   
     }
@@ -137,21 +140,20 @@ class ImportService extends BaseService
             ],
             [
                 'contact_phone'  => 'The phone number field is not valid.',
+            ],
+            [
+                'first_name' => 'first name',
+                'last_name'  => 'last name',
+                'middle_name' => 'middle name',
+                'address_street'  => 'street',
+                'address_brgy' => 'barangay',
+                'address_city'  => 'city',
+                'address_province' => 'province',
+                'contact_phone'  => 'phone number',
+                'contact_mobile' => 'mobile number',
             ]
-            // [
-            //     'first_name' => 'first name',
-            //     'last_name'  => 'last name',
-            //     'middle_name' => 'middle name',
-            //     'address_street'  => 'street',
-            //     'address_brgy' => 'barangay',
-            //     'address_city'  => 'city',
-            //     'address_province' => 'province',
-            //     'contact_phone'  => 'The phone number field is not valid.',
-            //     'contact_mobile' => 'mobile',
-            // ]
             );
             if ($validator->stopOnFirstFailure()->fails()) {
-                dd($validator->errors());
                 $aErrors = $validator->errors();
                 $sErrorKey = $aErrors->keys()[0];
                 $sErrorMessage = 'From the data of: ' . $aData['email'];
@@ -170,14 +172,16 @@ class ImportService extends BaseService
      * Chunk and dispatch the imported data
      *
      * @param  array $aImportedData
-     * @return void
+     * @return Batch
      */
-    private function dispatchImports(array $aImportedData): void
+    private function dispatchImports(array $aImportedData): Batch
     {
         $aChunkedImportedData = array_chunk($aImportedData, 300);// chunks the data to 300
-
+        $oBatch = Bus::batch([])->dispatch();
         foreach ($aChunkedImportedData as $iIndex => $aImportRow) {
-            ProcessImport::dispatch($aChunkedImportedData[$iIndex]); //dispatch the job to queue
+            $oBatch->add(new ProcessImport($aChunkedImportedData[$iIndex]));
+            //ProcessImport::dispatch($aChunkedImportedData[$iIndex]); //dispatch the job to queue
         }
+        return $oBatch;
     }
 }

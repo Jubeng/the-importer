@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ImportService;
+use App\Services\JobService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,14 +20,22 @@ class HomeController extends Controller
     protected $oImportService;
 
     /**
+     * oJobService
+     *
+     * @var JobService
+     */
+    protected $oJobService;
+
+    /**
      * Create a new controller instance.
      *
      * @param  mixed $oImportService
      * @return void
      */
-    public function __construct(ImportService $oImportService)
+    public function __construct(ImportService $oImportService, JobService $oJobService)
     {
         $this->oImportService = $oImportService;
+        $this->oJobService = $oJobService;
         $this->middleware('auth');
     }
 
@@ -48,7 +57,14 @@ class HomeController extends Controller
 
         $aImports = $this->oImportService->getImports($aPageDetails);
         $aImports['page'] = $aPageDetails['page'];
-        $aImports['jobs'] = false;//DB::table('jobs')->where('payload', 'like', '%'. Auth::user()->id .'%')->get();
+        $aImports['jobs'] = false;
+        $sBatchId = session()->get('sCurrentBatchId');
+        if ($sBatchId !== null) {
+            $aImports['jobs'] = $this->oJobService->getImportProgressById(['batch_id' => $sBatchId]);
+            if ($aImports['jobs'] === 100) {
+                session()->forget('sCurrentBatchId');
+            }
+        }
         return view('home', $aImports);
     }
 }

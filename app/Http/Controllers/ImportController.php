@@ -43,9 +43,12 @@ class ImportController extends Controller
         // Get the uploaded file
         $oFile = $oRequest->file('import_file');
         
-        return $this->oImportService->importFile([
+        $aImportResponse = $this->oImportService->importFile([
             'import_file' => $oFile,
             'user_id'     => $oRequest->get('user_id')
         ]);
+        session()->put('sCurrentBatchId', $aImportResponse['batch_id']);
+
+        return redirect('home');
     }
 }

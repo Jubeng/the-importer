@@ -6,7 +6,7 @@
     $totalPage = $count / 10;
 @endphp
 <div class="container">
-    @if ($jobs === true)
+    @if ($jobs !== false)
         <div class="modal-backdrop fade show"></div>
         <!-- Modal -->
         <div class="modal fade show" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-modal="true" role="dialog" style="display: block;">
@@ -18,10 +18,10 @@
                         </h1>
                     </div>
                     <div class="modal-body">
-                        <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 75%;"></div>
+                        <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="{{ $jobs }}" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {{ $jobs }}%;"></div>
                         </div>
-                        Please wait before importing again, thank you... 
+                        Please wait before importing again, thank you...
                     </div>
                 </div>
             </div>
