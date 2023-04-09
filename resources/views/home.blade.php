@@ -6,27 +6,86 @@
     $totalPage = $count / 10;
 @endphp
 <div class="container">
-    @if ($jobs !== false)
-        <div class="modal-backdrop fade show"></div>
-        <!-- Modal -->
-        <div class="modal fade show" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-modal="true" role="dialog" style="display: block;">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                            Importing data...
-                        </h1>
+    <div id="modalBackDrop" class="modal-backdrop fade" style="display: none;"></div>
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                        Importing data...
+                    </h1>
+                </div>
+                <div class="modal-body">
+                    <div id="progressAnimation" class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
                     </div>
-                    <div class="modal-body">
-                        <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="{{ $jobs }}" aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {{ $jobs }}%;"></div>
-                        </div>
-                        Please wait before importing again, thank you...
-                    </div>
+                    Please wait before importing again, thank you... 
+                    Don't close your browser to keep track of your progress.
                 </div>
             </div>
         </div>
-    @endif
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                        Edit Data
+                    </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" name="last_name" id="editFirstName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">First Name</label>
+                        <input type="text" class="form-control" name="first_name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Middle Name</label>
+                        <input type="text" class="form-control" name="first_name" >
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Street</label>
+                        <input type="text" class="form-control" name="first_name" id="editFirstName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Barangay</label>
+                        <input type="text" class="form-control" name="first_name" id="editFirstName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">City</label>
+                        <input type="text" class="form-control" name="first_name" id="editFirstName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Province</label>
+                        <input type="text" class="form-control" name="first_name" id="editFirstName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" name="first_name" id="editFirstName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Mobile Number</label>
+                        <input type="text" class="form-control" name="first_name" id="editFirstName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Email</label>
+                        <input type="text" class="form-control" name="first_name" id="editFirstName">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                  </div>
+            </div>
+        </div>
+    </div>
     
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -58,7 +117,6 @@
                                     <form class="row col" action="{{ route('import') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <div class="mb-3">
-                                            <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
                                             <input class="form-control form-control-sm" id="importFile" name="import_file" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                         </div>
                                         <div class="col-12">
@@ -77,7 +135,6 @@
                                     <form class="row col" action="{{ route('export') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <p class="card-text">Export by current page or all your data.</p>
-                                        <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
                                         <input type="hidden" name="page" value="1">
                                         <div class="d-flex flex-row">
                                             <div class="p-2">
@@ -110,7 +167,7 @@
                             @foreach ($imports as $aImport)
                                 <tr>
                                     <td scope="row">
-                                        <input class="form-check-input me-1" type="checkbox" value="{{$aImport['import_id'] }}" name="chkBoxImport">
+                                        <input class="form-check-input me-1" type="checkbox" value="{{ $aImport['import_id'] }}" name="chkBoxImport">
                                     </td>
                                     <td>
                                         {{ $aImport['first_name'] }} {{$aImport['middle_name']}} {{ $aImport['last_name'] }}
@@ -121,8 +178,10 @@
                                     <td>{{ $aImport['email'] }}</td>
                                     <td>
                                         <div class="btn-group" role="group" aria-label="Basic example">
-                                            <button type="button" class="btn btn-primary">Edit</button>
-                                            <button type="button" class="btn btn-danger">Delete</button>
+                                            <a type="button" href="{{ route('view-edit', ['import_id' => $aImport['import_id']]) }}" name="editRow" class="btn btn-primary">Edit</a>
+                                            <form action="{{ route('delete') }}" method="POST" enctype="multipart/form-data">
+                                                <button type="button" name="import_id" value="{{ $aImport['import_id'] }}" class="btn btn-danger">Delete</button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

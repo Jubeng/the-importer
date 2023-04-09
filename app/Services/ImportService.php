@@ -5,9 +5,10 @@ namespace App\Services;
 use App\Jobs\ProcessImport;
 use App\Services\BaseService;
 use Illuminate\Bus\Batch;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -40,6 +41,7 @@ class ImportService extends BaseService
     public function importFile(array $aFile): RedirectResponse | array
     {
         try {
+            $aFile['user_id'] = Auth::user()->id;
             $oSpreadSheet = IOFactory::load($aFile['import_file']);
             // Get the active sheet
             $aWorkSheet = $oSpreadSheet->getActiveSheet();
@@ -72,6 +74,20 @@ class ImportService extends BaseService
                 'status'  => 500
             ];
         }   
+    }
+    
+    /**
+     * Fetch the import data by Import Id and User Id
+     *
+     * @param  array $aImportDetails
+     * @return object | null
+     */
+    public function getImportDataById(array $aImportDetails): object | null
+    {
+        $aImportDetails['user_id'] = Auth::user()->id;
+        return DB::table('import')->where('user_id', '=', $aImportDetails['user_id'])
+                                  ->where('import_id', '=', $aImportDetails['import_id'])
+                                  ->first();
     }
     
     /**
@@ -180,7 +196,6 @@ class ImportService extends BaseService
         $oBatch = Bus::batch([])->dispatch();
         foreach ($aChunkedImportedData as $iIndex => $aImportRow) {
             $oBatch->add(new ProcessImport($aChunkedImportedData[$iIndex]));
-            //ProcessImport::dispatch($aChunkedImportedData[$iIndex]); //dispatch the job to queue
         }
         return $oBatch;
     }
