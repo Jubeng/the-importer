@@ -12,6 +12,7 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/8a077925bd.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <div id="app">
@@ -75,7 +76,8 @@
     </div>
     <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/js/checkProgress.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @yield('script')
 </body>
 
 </html>

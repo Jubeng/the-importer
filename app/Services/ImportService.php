@@ -7,7 +7,6 @@ use App\Services\BaseService;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
@@ -40,44 +39,35 @@ class ImportService extends BaseService
      */
     public function importFile(array $aFile): RedirectResponse | array
     {
-        try {
-            $aFile['user_id'] = Auth::user()->id;
-            $oSpreadSheet = IOFactory::load($aFile['import_file']);
-            // Get the active sheet
-            $aWorkSheet = $oSpreadSheet->getActiveSheet();
+        $aFile['user_id'] = Auth::user()->id;
+        $oSpreadSheet = IOFactory::load($aFile['import_file']);
+        // Get the active sheet
+        $aWorkSheet = $oSpreadSheet->getActiveSheet();
 
-            // Get the highest row number and column letter
-            $iHighestRow = $aWorkSheet->getHighestRow();
-            $sHighestColumn = $aWorkSheet->getHighestColumn();
-            $aSpreadSheetData = [
-                'work_sheet' => $aWorkSheet,
-                'highest_row' => $iHighestRow,
-                'highest_column' => $sHighestColumn
-            ];
-            $aImportedData = $this->getAllRowsFromExcel($aSpreadSheetData,  $aFile['user_id']);
-            $mValidatorResponse = $this->validateRowData($aImportedData);
+        // Get the highest row number and column letter
+        $iHighestRow = $aWorkSheet->getHighestRow();
+        $sHighestColumn = $aWorkSheet->getHighestColumn();
+        $aSpreadSheetData = [
+            'work_sheet'     => $aWorkSheet,
+            'highest_row'    => $iHighestRow,
+            'highest_column' => $sHighestColumn
+        ];
+        $aImportedData = $this->getAllRowsFromExcel($aSpreadSheetData,  $aFile['user_id']);
+        $mValidatorResponse = $this->validateRowData($aImportedData);
 
-            if ($mValidatorResponse !== true) {
-                return $mValidatorResponse;
-            }
-            $oBatch = $this->dispatchImports($aImportedData);
-            return [
-                'message'  => 'Importing...',
-                'batch_id' => $oBatch->id,
-                'status'   => 200
-            ];
-        } catch (\Exception $oException) {
-            // handle any exceptions that may occur in importFile
-            return [
-                'message' => 'Failed to add data.',
-                'error'   => $oException->getMessage(),
-                'status'  => 500
-            ];
-        }   
+        if ($mValidatorResponse !== true) {
+            return $mValidatorResponse;
+        }
+        $oBatch = $this->dispatchImports($aImportedData);
+        return [
+            'message'  => 'Importing...',
+            'batch_id' => $oBatch->id,
+            'status'   => 200
+        ];  
     }
     
     /**
-     * Fetch the import data by Import Id and User Id
+     * Fetch the import data by Import Id and User Id in the database
      *
      * @param  array $aImportDetails
      * @return object | null
@@ -88,6 +78,42 @@ class ImportService extends BaseService
         return DB::table('import')->where('user_id', '=', $aImportDetails['user_id'])
                                   ->where('import_id', '=', $aImportDetails['import_id'])
                                   ->first();
+    }
+    
+    /**
+     * Edit the import data by import_id and user_id in the database
+     *
+     * @param  mixed $aImportData
+     * @return array
+     */
+    public function editImport(array $aImportData): array
+    {
+        $aImportData['user_id'] = Auth::user()->id;
+        $iChangedRow = DB::table('import')
+            ->where('import_id', '=', $aImportData['import_id'])
+            ->where('user_id', '=', $aImportData['user_id'])
+            ->update([
+                'last_name'        => $aImportData['last_name'],
+                'first_name'       => $aImportData['first_name'],
+                'middle_name'      => $aImportData['middle_name'],
+                'address_street'   => $aImportData['address_street'],
+                'address_brgy'     => $aImportData['address_brgy'],
+                'address_city'     => $aImportData['address_city'],
+                'address_province' => $aImportData['address_province'],
+                'contact_phone'    => $aImportData['contact_phone'],
+                'contact_mobile'   => $aImportData['contact_mobile'],
+                'email'            => $aImportData['email']
+            ]);
+        $oResponse = [
+            'result'  => 'success',
+            'message' => 'Successfully updated data of: '
+        ];
+        if ($iChangedRow !== 1) {
+            $oResponse['result'] = 'error';
+            $oResponse['message'] = 'Error occurred while updating the data of: ';
+        }
+        $oResponse['message'] .= $aImportData['email'];
+        return $oResponse;
     }
     
     /**
@@ -131,7 +157,7 @@ class ImportService extends BaseService
     }
     
     /**
-     * Validation for rows of the file
+     * Validation for rows of the file for add
      *
      * @param  array $aRowData
      * @return  RedirectResponse | bool
@@ -143,30 +169,30 @@ class ImportService extends BaseService
         });
         foreach ($aRowData as $aData) {
             $validator = Validator::make($aData, [
-                'first_name' => 'required|string|min:2|max:50',
-                'last_name' => 'required|string|min:2|max:50',
-                'middle_name' => 'string|min:2|max:50',
-                'address_street' => 'required|string|min:2|max:100',
-                'address_brgy' => 'required|string|min:2|max:100',
-                'address_city' => 'required|string|min:2|max:50',
+                'first_name'       => 'required|string|min:2|max:50',
+                'last_name'        => 'required|string|min:2|max:50',
+                'middle_name'      => 'string|min:2|max:50',
+                'address_street'   => 'required|string|min:2|max:100',
+                'address_brgy'     => 'required|string|min:2|max:100',
+                'address_city'     => 'required|string|min:2|max:50',
                 'address_province' => 'required|string|min:2|max:50',
-                'contact_phone' => 'phone_number|max:15',
-                'contact_mobile' => 'required|phone_number|min:9|max:15',
-                'email' => 'required|email|max:255|unique:import',
+                'contact_phone'    => 'phone_number|max:15',
+                'contact_mobile'   => 'required|phone_number|min:9|max:15',
+                'email'            => 'required|email|max:255|unique:import,',
             ],
             [
-                'contact_phone'  => 'The phone number field is not valid.',
+                'contact_phone'    => 'The phone number field is not valid.',
             ],
             [
-                'first_name' => 'first name',
-                'last_name'  => 'last name',
-                'middle_name' => 'middle name',
-                'address_street'  => 'street',
-                'address_brgy' => 'barangay',
-                'address_city'  => 'city',
+                'first_name'       => 'first name',
+                'last_name'        => 'last name',
+                'middle_name'      => 'middle name',
+                'address_street'   => 'street',
+                'address_brgy'     => 'barangay',
+                'address_city'     => 'city',
                 'address_province' => 'province',
-                'contact_phone'  => 'phone number',
-                'contact_mobile' => 'mobile number',
+                'contact_phone'    => 'phone number',
+                'contact_mobile'   => 'mobile number',
             ]
             );
             if ($validator->stopOnFirstFailure()->fails()) {

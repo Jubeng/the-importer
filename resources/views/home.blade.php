@@ -26,66 +26,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-modal="true" role="dialog">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                        Edit Data
-                    </h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" name="last_name" id="editFirstName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">First Name</label>
-                        <input type="text" class="form-control" name="first_name">
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Middle Name</label>
-                        <input type="text" class="form-control" name="first_name" >
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Street</label>
-                        <input type="text" class="form-control" name="first_name" id="editFirstName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Barangay</label>
-                        <input type="text" class="form-control" name="first_name" id="editFirstName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">City</label>
-                        <input type="text" class="form-control" name="first_name" id="editFirstName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Province</label>
-                        <input type="text" class="form-control" name="first_name" id="editFirstName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Phone Number</label>
-                        <input type="text" class="form-control" name="first_name" id="editFirstName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Mobile Number</label>
-                        <input type="text" class="form-control" name="first_name" id="editFirstName">
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Email</label>
-                        <input type="text" class="form-control" name="first_name" id="editFirstName">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                  </div>
-            </div>
-        </div>
-    </div>
     
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -93,9 +33,9 @@
                 <div class="card-header">{{ __('Manage Import') }}</div>
 
                 <div class="card-body">
-                    @if (session('status'))
+                    @if (session('success'))
                         <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
+                            {{ session('success') }}
                         </div>
                     @endif
                     @if($errors->any())
@@ -152,9 +92,6 @@
                     <table class="table table-responsive mt-5">
                         <thead class="thead ">
                             <tr class="table-light">
-                                <th scope="col-1">
-                                    <input class="form-check-input me-1" type="checkbox" name="chkBoxImportAll">
-                                </th>
                                 <th scope="col-3">Name</th>
                                 <th scope="col">Address</th>
                                 <th scope="col">Phone</th>
@@ -166,9 +103,6 @@
                         <tbody class="table-group-divider">
                             @foreach ($imports as $aImport)
                                 <tr>
-                                    <td scope="row">
-                                        <input class="form-check-input me-1" type="checkbox" value="{{ $aImport['import_id'] }}" name="chkBoxImport">
-                                    </td>
                                     <td>
                                         {{ $aImport['first_name'] }} {{$aImport['middle_name']}} {{ $aImport['last_name'] }}
                                     </td>
@@ -177,11 +111,28 @@
                                     <td>{{ $aImport['contact_mobile'] }}</td>
                                     <td>{{ $aImport['email'] }}</td>
                                     <td>
-                                        <div class="btn-group" role="group" aria-label="Basic example">
-                                            <a type="button" href="{{ route('view-edit', ['import_id' => $aImport['import_id']]) }}" name="editRow" class="btn btn-primary">Edit</a>
-                                            <form action="{{ route('delete') }}" method="POST" enctype="multipart/form-data">
-                                                <button type="button" name="import_id" value="{{ $aImport['import_id'] }}" class="btn btn-danger">Delete</button>
-                                            </form>
+                                        <div class="row">
+                                            <div class="col">
+                                                <form action="{{ route('view-edit', [
+                                                    'import_id' => $aImport['import_id'],
+                                                    'page'      => $page,
+                                                    ]) }}" method="GET" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <input type="hidden" name="page" value="{{ $page }}">
+                                                    <input type="hidden" name="import_id" value="{{ $aImport['import_id'] }}">
+                                                    <button type="submit" name="editRow" class="btn btn-primary">
+                                                        <i class='fas fa-pen' style='font-size:14px;color:white'></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <div class="col ps-0">
+                                                <form action="{{ route('delete') }}" method="POST" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <button type="submit" name="import_id" value="{{ $aImport['import_id'] }}" class="btn btn-danger">
+                                                        <i class='far fa-trash-alt' style='font-size:14px;color:white'></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -212,4 +163,7 @@
         </div>
     </div>
 </div>
+@endsection
+@section('script')
+    @vite(['resources/js/checkProgress.js'])
 @endsection

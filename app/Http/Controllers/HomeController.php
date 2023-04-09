@@ -43,8 +43,13 @@ class HomeController extends Controller
             'limit' => 10,
             'user_id' => Auth::user()->id
         ];
+
         if ($oRequest->has('page')) {
             $aPageDetails['page'] = $oRequest->input('page');
+        }
+        $mPageSession = session()->get('page');
+        if (session()->get('page') !== null) {
+            $aPageDetails['page'] = $mPageSession;
         }
 
         $aImports = $this->oImportService->getImports($aPageDetails);

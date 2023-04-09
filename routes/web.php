@@ -29,7 +29,7 @@ Route::post('/import', [ImportController::class, 'importFile'])->name('import');
 Route::get('/check-job-progress', [ImportController::class, 'checkJobProgress'])->name('job-progress');
 
 Route::get('/edit', [ImportController::class, 'viewEditImport'])->name('view-edit');
-Route::post('/edit', [ImportController::class, 'editImport'])->name('edit');
+Route::put('/edit-data', [ImportController::class, 'editImport'])->name('edit-data');
 
 Route::post('/delete', [ImportController::class, 'deleteImport'])->name('delete');
 
