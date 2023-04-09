@@ -40,6 +40,7 @@ class ImportService extends BaseService
     public function importFile(array $aFile): RedirectResponse | array
     {
         $aFile['user_id'] = Auth::user()->id;
+
         $oSpreadSheet = IOFactory::load($aFile['import_file']);
         // Get the active sheet
         $aWorkSheet = $oSpreadSheet->getActiveSheet();
@@ -52,6 +53,7 @@ class ImportService extends BaseService
             'highest_row'    => $iHighestRow,
             'highest_column' => $sHighestColumn
         ];
+
         $aImportedData = $this->getAllRowsFromExcel($aSpreadSheetData,  $aFile['user_id']);
         $mValidatorResponse = $this->validateRowData($aImportedData);
 
@@ -117,6 +119,57 @@ class ImportService extends BaseService
     }
     
     /**
+     * Deletes the row by user_id and import_id in the database
+     *
+     * @param  array $aImportData
+     * @return array
+     */
+    public function deleteImport(array $aImportData): array
+    {
+        $aImportData['user_id'] = Auth::user()->id;
+        $iDeletedRow = 0;
+        $oResponse = [
+            'single' => [
+                'success' => [
+                    'result'  => 'success',
+                    'message' => 'Successfully deleted the data of: '
+                ],
+                'error' => [
+                    'result'  => 'error',
+                    'message' => 'Error occurred while deleting the data of:'
+                ]
+            ],
+            'all' => [
+                'success' => [
+                    'result'  => 'success',
+                    'message' => 'Successfully deleted all your data.'
+                ],
+                'error' => [
+                    'result'  => 'error',
+                    'message' => 'Error occurred while deleting deleted all your data.'
+                ]
+            ]
+        ];
+        if ($aImportData['type'] === 'single') {
+            $oResponse[$aImportData['type']]['success']['message'] .= $aImportData['email'];
+            $oResponse[$aImportData['type']]['error']['message'] .= $aImportData['email'];
+            $iDeletedRow = DB::table('import')
+                ->where('import_id', '=', $aImportData['import_id'])
+                ->where('user_id', '=', $aImportData['user_id'])
+                ->delete();
+        } else {
+            $iDeletedRow = DB::table('import')
+            ->where('user_id', '=', $aImportData['user_id'])
+            ->delete();
+        }
+        
+        if ($iDeletedRow < 1) {
+            return $oResponse[$aImportData['type']]['error'];
+        }
+        return $oResponse[$aImportData['type']]['success'];
+    }
+    
+    /**
      * Returns all the row in the Excel file in array form
      *
      * @param  array $aSpreadSheetData
@@ -178,7 +231,7 @@ class ImportService extends BaseService
                 'address_province' => 'required|string|min:2|max:50',
                 'contact_phone'    => 'phone_number|max:15',
                 'contact_mobile'   => 'required|phone_number|min:9|max:15',
-                'email'            => 'required|email|max:255|unique:import,',
+                'email'            => 'required|email|max:255|unique:import',
             ],
             [
                 'contact_phone'    => 'The phone number field is not valid.',
