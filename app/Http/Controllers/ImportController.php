@@ -48,14 +48,14 @@ class ImportController extends Controller
     /**
      * receives and store the imported xls or xlsx in database
      *
-     * @param  ImportFileRequest $oRequest
+     * @param  object $oRequest
      * @return RedirectResponse
      */
     public function importFile(ImportFileRequest $oRequest): RedirectResponse
     {
         try {
             $oFile = $oRequest->file('import_file');
-            
+
             $aImportResponse = $this->oImportService->importFile([
                 'import_file' => $oFile
             ]);
@@ -103,7 +103,7 @@ class ImportController extends Controller
     /**
      * Fetch the import details and display the edit form
      *
-     * @param  EditRequest $oRequest
+     * @param  object $oRequest
      * @return View
      */
     public function viewEditImport(EditRequest $oRequest): View | RedirectResponse
@@ -126,7 +126,7 @@ class ImportController extends Controller
     /**
      * Edit the import data
      *
-     * @param  ImportRequest $oRequest
+     * @param  object $oRequest
      * @return RedirectResponse
      */
     public function editImport(ImportRequest $oRequest): RedirectResponse
@@ -156,7 +156,7 @@ class ImportController extends Controller
     {
         try {
             $aParam = $oRequest->all();
-            $aDeleteImportResponse = [];
+            $aDeleteImportResponse = $this->oImportService->deleteImport($aParam);
             return redirect()->route('home')->with([
                 $aDeleteImportResponse['result'] => $aDeleteImportResponse['message'],
                 'page'                           => $aParam['page']
