@@ -27,6 +27,7 @@ class HomeController extends Controller
     public function __construct(ImportService $oImportService)
     {
         $this->oImportService = $oImportService;
+        // $this->oJobService = $oJobService;
         $this->middleware('auth');
     }
 
@@ -42,13 +43,18 @@ class HomeController extends Controller
             'limit' => 10,
             'user_id' => Auth::user()->id
         ];
+
         if ($oRequest->has('page')) {
             $aPageDetails['page'] = $oRequest->input('page');
+        }
+        $mPageSession = session()->get('page');
+        if (session()->get('page') !== null) {
+            $aPageDetails['page'] = $mPageSession;
         }
 
         $aImports = $this->oImportService->getImports($aPageDetails);
         $aImports['page'] = $aPageDetails['page'];
-        $aImports['jobs'] = false;//DB::table('jobs')->where('payload', 'like', '%'. Auth::user()->id .'%')->get();
+        $aImports['jobs'] = false;
         return view('home', $aImports);
     }
 }

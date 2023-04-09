@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ExportService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * ExportController
@@ -36,7 +37,9 @@ class ExportController
      */
     public function exportData(Request $oRequest)
     {
-        $aFileDetails = $this->oExportService->exportData($oRequest->all());
+        $aParam = $oRequest->all();
+        $aParam['user_id'] = Auth::user()->id;
+        $aFileDetails = $this->oExportService->exportData($aParam);
 
         return response()->download($aFileDetails['file_name'], $aFileDetails['file_name'], [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

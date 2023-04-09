@@ -6,27 +6,26 @@
     $totalPage = $count / 10;
 @endphp
 <div class="container">
-    @if ($jobs === true)
-        <div class="modal-backdrop fade show"></div>
-        <!-- Modal -->
-        <div class="modal fade show" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-modal="true" role="dialog" style="display: block;">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                            Importing data...
-                        </h1>
+    <div id="modalBackDrop" class="modal-backdrop fade" style="display: none;"></div>
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                        Importing data...
+                    </h1>
+                </div>
+                <div class="modal-body">
+                    <div id="progressAnimation" class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
                     </div>
-                    <div class="modal-body">
-                        <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 75%;"></div>
-                        </div>
-                        Please wait before importing again, thank you... 
-                    </div>
+                    Please wait before importing again, thank you... 
+                    Don't close your browser to keep track of your progress.
                 </div>
             </div>
         </div>
-    @endif
+    </div>
     
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -34,9 +33,9 @@
                 <div class="card-header">{{ __('Manage Import') }}</div>
 
                 <div class="card-body">
-                    @if (session('status'))
+                    @if (session('success'))
                         <div class="alert alert-success" role="alert">
-                            {{ session('status') }}
+                            {{ session('success') }}
                         </div>
                     @endif
                     @if($errors->any())
@@ -58,7 +57,6 @@
                                     <form class="row col" action="{{ route('import') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <div class="mb-3">
-                                            <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
                                             <input class="form-control form-control-sm" id="importFile" name="import_file" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
                                         </div>
                                         <div class="col-12">
@@ -77,7 +75,6 @@
                                     <form class="row col" action="{{ route('export') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <p class="card-text">Export by current page or all your data.</p>
-                                        <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
                                         <input type="hidden" name="page" value="1">
                                         <div class="d-flex flex-row">
                                             <div class="p-2">
@@ -95,9 +92,6 @@
                     <table class="table table-responsive mt-5">
                         <thead class="thead ">
                             <tr class="table-light">
-                                <th scope="col-1">
-                                    <input class="form-check-input me-1" type="checkbox" name="chkBoxImportAll">
-                                </th>
                                 <th scope="col-3">Name</th>
                                 <th scope="col">Address</th>
                                 <th scope="col">Phone</th>
@@ -109,9 +103,6 @@
                         <tbody class="table-group-divider">
                             @foreach ($imports as $aImport)
                                 <tr>
-                                    <td scope="row">
-                                        <input class="form-check-input me-1" type="checkbox" value="{{$aImport['import_id'] }}" name="chkBoxImport">
-                                    </td>
                                     <td>
                                         {{ $aImport['first_name'] }} {{$aImport['middle_name']}} {{ $aImport['last_name'] }}
                                     </td>
@@ -120,9 +111,28 @@
                                     <td>{{ $aImport['contact_mobile'] }}</td>
                                     <td>{{ $aImport['email'] }}</td>
                                     <td>
-                                        <div class="btn-group" role="group" aria-label="Basic example">
-                                            <button type="button" class="btn btn-primary">Edit</button>
-                                            <button type="button" class="btn btn-danger">Delete</button>
+                                        <div class="row">
+                                            <div class="col">
+                                                <form action="{{ route('view-edit', [
+                                                    'import_id' => $aImport['import_id'],
+                                                    'page'      => $page,
+                                                    ]) }}" method="GET" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <input type="hidden" name="page" value="{{ $page }}">
+                                                    <input type="hidden" name="import_id" value="{{ $aImport['import_id'] }}">
+                                                    <button type="submit" name="editRow" class="btn btn-primary">
+                                                        <i class='fas fa-pen' style='font-size:14px;color:white'></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <div class="col ps-0">
+                                                <form action="{{ route('delete') }}" method="POST" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <button type="submit" name="import_id" value="{{ $aImport['import_id'] }}" class="btn btn-danger">
+                                                        <i class='far fa-trash-alt' style='font-size:14px;color:white'></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -153,4 +163,7 @@
         </div>
     </div>
 </div>
+@endsection
+@section('script')
+    @vite(['resources/js/checkProgress.js'])
 @endsection
