@@ -4,6 +4,9 @@
 @php
     $page = (int)$page;
     $totalPage = $count / 10;
+    $maxPagePerGroup = 7;
+    $pageToShow = 3;
+    $midPage = 5;
 @endphp
 <div class="container">
     <div id="modalBackDrop" class="modal-backdrop fade" style="display: none;"></div>
@@ -130,60 +133,64 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <table class="table table-responsive mt-3">
-                        <thead class="thead ">
-                            <tr class="table-light">
-                                <th scope="col-3">Name</th>
-                                <th scope="col">Address</th>
-                                <th scope="col">Phone</th>
-                                <th scope="col">Mobile</th>
-                                <th scope="col">Email</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="table">
-                            @foreach ($imports as $aImport)
-                                <tr>
-                                    <td>
-                                        {{ $aImport['first_name'] }} {{$aImport['middle_name']}} {{ $aImport['last_name'] }}
-                                    </td>
-                                    <td>{{ $aImport['address_street'] }} {{ $aImport['address_brgy'] }} {{ $aImport['address_city'] }} {{ $aImport['address_province'] }}</td>
-                                    <td>{{ $aImport['contact_phone'] === '' ? 'N/A' : $aImport['contact_phone'] }}</td>
-                                    <td>{{ $aImport['contact_mobile'] }}</td>
-                                    <td>{{ $aImport['email'] }}</td>
-                                    <td>
-                                        <div class="row">
-                                            <div class="col">
-                                                <form action="{{ route('view-edit', [
-                                                    'import_id' => $aImport['import_id'],
-                                                    'page'      => $page,
-                                                    ]) }}" method="GET" enctype="multipart/form-data">
-                                                    @csrf
-                                                    <input type="hidden" name="page" value="{{ $page }}">
-                                                    <input type="hidden" name="import_id" value="{{ $aImport['import_id'] }}">
-                                                    <button type="submit" name="editRow" class="btn btn-primary">
-                                                        <i class='fas fa-edit' style='font-size:14px;color:white'></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                            <div class="col ps-0">
-                                                <form action="{{ route('delete') }}" method="POST" enctype="multipart/form-data">
-                                                    @csrf
-                                                    <input type="hidden" name="page" value="{{ $page }}">
-                                                    <input type="hidden" name="email" value="{{ $aImport['email'] }}">
-                                                    <input type="hidden" name="type" value="single">
-                                                    <button type="submit" name="import_id" value="{{ $aImport['import_id'] }}" class="btn btn-danger">
-                                                        <i class='far fa-trash-alt' style='font-size:14px;color:white'></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </td>
+                    <div class="table-responsive-md mt-3">
+                        <table class="table align-middle">
+                            <thead class="thead ">
+                                <tr class="table-light">
+                                    <th scope="col-3">Name</th>
+                                    <th scope="col">Address</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Mobile</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col"></th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="table">
+                                @foreach ($imports as $aImport)
+                                    <tr>
+                                        <td>
+                                            {{ $aImport['first_name'] }} {{$aImport['middle_name']}} {{ $aImport['last_name'] }}
+                                        </td>
+                                        <td>{{ $aImport['address_street'] }} {{ $aImport['address_brgy'] }} {{ $aImport['address_city'] }} {{ $aImport['address_province'] }}</td>
+                                        <td>{{ $aImport['contact_phone'] === '' ? 'N/A' : $aImport['contact_phone'] }}</td>
+                                        <td>{{ $aImport['contact_mobile'] }}</td>
+                                        <td>{{ $aImport['email'] }}</td>
+                                        <td>
+                                            <div class="d-flex flex-row">
+                                                <div class="p">
+                                                    <form action="{{ route('view-edit', [
+                                                        'import_id' => $aImport['import_id'],
+                                                        'page'      => $page,
+                                                        ]) }}" method="GET" enctype="multipart/form-data">
+                                                        @csrf
+                                                        <input type="hidden" name="page" value="{{ $page }}">
+                                                        <input type="hidden" name="import_id" value="{{ $aImport['import_id'] }}">
+                                                        <button type="submit" name="editRow" class="btn text-primary"
+                                                                style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                                                                <i class='fas fa-edit'></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <div class="p">
+                                                    <form action="{{ route('delete') }}" method="POST" enctype="multipart/form-data">
+                                                        @csrf
+                                                        <input type="hidden" name="page" value="{{ $page }}">
+                                                        <input type="hidden" name="email" value="{{ $aImport['email'] }}">
+                                                        <input type="hidden" name="type" value="single">
+                                                        <button type="submit" name="import_id" value="{{ $aImport['import_id'] }}" class="btn text-danger"
+                                                            style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                                                            <i class='far fa-trash-alt'></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    
                     @if (count($imports) <= 0)
                         <div class="alert alert-dark mt-2 text-center" role="alert">
                             No results found. You can import data using .xls and .xlsx files.
@@ -192,18 +199,18 @@
                     @if($count > 10)
                         <nav aria-label="Page navigation example">
                             <ul class="pagination justify-content-center">
-                                <li class="page-item {{(($page  - 10) <= 0 ? 'disabled' : '')}}">
+                                <li class="page-item {{(($page  - $maxPagePerGroup) <= 0 ? 'disabled' : '')}}">
                                     <a class="page-link" href="{{ route('home', [
-                                            'page' => ($page - 10) <= 1 ? 1 : $page - 10
+                                            'page' => ($page - $maxPagePerGroup) <= 1 ? 1 : $page - $maxPagePerGroup
                                         ]) }}"><<</a>
                                 </li>
-                                @for ($iCounter = ($page >= 6 ? ($page - 4) : 1); $iCounter <= $totalPage; $iCounter++)
-                                    @if ($iCounter <= ($page < 6 ? 10 : $page + 5))
+                                @for ($iCounter = ($page >= $midPage ? ($page - $pageToShow) : 1); $iCounter <= $totalPage; $iCounter++)
+                                    @if ($iCounter <= ($page < $midPage ? $maxPagePerGroup : $page + $pageToShow))
                                         <li class="page-item"><a class="page-link {{ $page === $iCounter ? 'active' : ''}}" href="{{ route('home', ['page' => $iCounter])}}">{{ $iCounter }}</a></li>
                                     @endif
                                 @endfor
-                                <li class="page-item {{(($page + 10) >= $totalPage ? 'disabled' : '')}}">
-                                    <a class="page-link" href="{{ route('home', ['page' => ($page + 10) >= $totalPage ? $totalPage : $page + 10])}}">>></a>
+                                <li class="page-item {{(($page + $maxPagePerGroup) >= $totalPage ? 'disabled' : '')}}">
+                                    <a class="page-link" href="{{ route('home', ['page' => ($page + $maxPagePerGroup) >= $totalPage ? $totalPage : $page + $maxPagePerGroup])}}">>></a>
                                 </li>
                             </ul>
                         </nav>
