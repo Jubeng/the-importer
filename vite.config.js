@@ -8,6 +8,8 @@ export default defineConfig({
             input: [
                 'resources/sass/app.scss',
                 'resources/js/app.js',
+                'resources/js/checkProgress.js',
+                'resources/js/showLoader.js',
             ],
             refresh: true,
         }),

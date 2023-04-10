@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Services\ImportService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
+/**
+ * HomeController
+ */
 class HomeController extends Controller
 {
     /**
@@ -23,6 +27,7 @@ class HomeController extends Controller
     public function __construct(ImportService $oImportService)
     {
         $this->oImportService = $oImportService;
+        // $this->oJobService = $oJobService;
         $this->middleware('auth');
     }
 
@@ -35,16 +40,21 @@ class HomeController extends Controller
     {
         $aPageDetails = [
             'page' => 1,
-            'limit' => 10
+            'limit' => 10,
+            'user_id' => Auth::user()->id
         ];
-        if ($oRequest->has('page') && $oRequest->has('limit')) {
+
+        if ($oRequest->has('page')) {
             $aPageDetails['page'] = $oRequest->input('page');
-            $aPageDetails['limit'] = $oRequest->input('limit');
+        }
+        $mPageSession = session()->get('page');
+        if (session()->get('page') !== null) {
+            $aPageDetails['page'] = $mPageSession;
         }
 
         $aImports = $this->oImportService->getImports($aPageDetails);
-        return view('home', [
-            'imports' => $aImports
-        ]);
+        $aImports['page'] = $aPageDetails['page'];
+        $aImports['jobs'] = false;
+        return view('home', $aImports);
     }
 }

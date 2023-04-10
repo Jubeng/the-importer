@@ -21,7 +21,7 @@ class ImportModelFactory extends Factory
             'user_id' => User::pluck('id')->random(),
             'first_name' => $this->faker->firstName(2, 50),
             'last_name'  => $this->faker->lastName(2, 50),
-            'middle_name' => $this->faker->lastName(8, 20),
+            'middle_name' => $this->faker->lastName(2, 20),
             'address_street' => $this->faker->streetAddress(2, 100),
             'address_brgy' => $this->faker->citySuffix(2, 100),
             'address_city' => $this->faker->city(2, 50),

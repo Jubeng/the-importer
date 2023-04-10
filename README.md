@@ -1,66 +1,36 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# The Importer
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A simple website to import .xls and .xlsx and manage their data.
+The Importer uses a queue to handle big data imports so that it can track the importing progress and manage the import process properly.
 
-## About Laravel
+Technical Analysis: https://docs.google.com/document/d/1104JKfRIUSEjgJQgRbyPDMb0cF6id-pOlfhDc13Dqic/edit?usp=sharing
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## For local setup:
+1. Clone this repository: https://github.com/Jubeng/the-importer
+2. Add the `.env` file that was sent through email.
+2. Run `composer install`.
+    - if an error occurred like `requires ext-gd * -> it is missing from your system. Install or enable PHP's gd extension.`, if you are using XAMPP, go to php.ini and uncomment `;extension=gd` and restart XAMPP then run `composer install` again.
+3. Create a database for The Importer: `the_importer` for the main database and `the_importer_test` for testing database, you can change the database configuration on `config/database.php` and `.env` that was sent on the email.
+4. after that, run `php artisan migrate:fresh` to create the tables.
+5. after that, install the required npm packages, run `npm install && npm run build`.
+5. To process the queue, run `php artisan queue:work`.
+5. in the other terminal, to run the app run `php artisan serve`.
+7. Go to the provided url. e.g.: http://127.0.0.1:8000/
+8. To check the feature test, open another terminal and run `php artisan test`.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## To use The Importer:
+1. In the welcome page, click Get Started button.
+2. If you are not logged in, you can log in your account.
+3. If you don't have an account, you can register
+    - User Authentication whole process is provided by Laravel. I used Laravel/ui for this authentication.
+4. After logging in, you will be redirected to the home page, where you can:
+    - Import an .xlsx and .xls file.
+        - Laravel Queue is used in this functionality to be able to track the importing progress of the user and to process big data properly.
+    - Export the data you uploaded.
+        - You can export all the data or export the current page
+    - Manage the data you uploaded.
+        - Edit and Delete functionality are available to the table.
+5. During import, you will not be able to do anything other than wait for the import process to finish.
+6. Pagination is provided to be able to display all the data of the user.
+5. You can populate your database with the provided seeder using `php artisan db:seed --class=ImportSeeder`, this will insert 100 rows, you can change it based on your preference seeder is located in the `database/seeders/ImportSeeder.php`. Please note that you need to have an account first in the app before using the seeder.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

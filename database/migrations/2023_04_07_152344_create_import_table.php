@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -12,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('import', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('import_id')->unsigned();
             $table->unsignedBigInteger('user_id');
             $table->string('last_name', 50);
             $table->string('first_name', 50);
@@ -24,7 +25,8 @@ return new class extends Migration
             $table->string('contact_phone', 15)->nullable();
             $table->string('contact_mobile', 15);
             $table->string('email', 255)->unique();
-            $table->timestamps();
+            $table->timestamp('created_at')->default(DB::raw('current_timestamp()'));
+            $table->timestamp('updated_at')->default(DB::raw('current_timestamp() ON UPDATE current_timestamp()'));
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
