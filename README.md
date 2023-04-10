@@ -8,11 +8,12 @@ Technical Analysis: https://docs.google.com/document/d/1104JKfRIUSEjgJQgRbyPDMb0
 ## For local setup:
 1. Clone this repository: https://github.com/Jubeng/the-importer
 2. Run `composer install`
-3. Create a database for The Importer: `the_importer` you can change it base on the ENV that was sent on the email.
+3. Create a database for The Importer: `the_importer` for the main database and `the_importer_test` for testing database, you can change the database configuration on `config/database.php` and ENV that was sent on the email.
 4. after that, run `php artisan migrate:fresh` to create table.
 5. You can populate your database with the provided seeder using `php artisan db:seed --class=ImportSeeder`, this will insert 20,000 rows, you can change it based on your preference.
 6. to run the app run `php artisan serve`.
 7. Go to the provided url. e.g.: http://127.0.0.1:8000/
+8. To check the feature test. run `php artisan test`.
 
 ## To use The Importer:
 1. In the welcome page, click Get Started button.
