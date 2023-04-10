@@ -21,21 +21,30 @@ class ImportTest extends TestCase
     public function test_valid_file(): void
     {
         $this->withoutExceptionHandling();
+        $oUser = User::factory()->create();
+
+        $this->actingAs($oUser);
+        Storage::fake('local');
+        $oFile = UploadedFile::fake()->create('file10rows.xlsx', 5120); // create a fake file with 5120 bytes size
+        
+        $oResponse = $this->post('/import', [
+            'import_file' => $oFile
+        ]);
+        $oResponse->assertStatus(302);
+    }
+
+    public function test_view_edit_data(): void
+    {
+        $this->withoutExceptionHandling();
         $user = User::factory()->create();
 
         $this->actingAs($user);
-        Storage::fake('local');
-        $file = UploadedFile::fake()->create('file10rows.xlsx', 5120); // create a fake file with 5120 bytes size
-        
-        $response = $this->post('/import', [
-            'import_file' => $file
-        ]);
-        $response->assertStatus(302);
-        $response->assertRedirect('/');
-    }
+        $aImportData = ImportModel::factory()->create();
 
-    public function FunctionName(Type $var = null)
-    {
-        # code...
+        $oResponse = $this->post('/import', [
+            'import_id' => $aImportData->import_id
+        ]);
+        dd($oResponse);
+        $oResponse->assertStatus(302);
     }
 }

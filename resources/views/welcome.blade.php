@@ -8,9 +8,9 @@
             <div class="card border-secondary mb-3">
                 <div class="card-header">Welcome to The Importer</div>
                 <div class="card-body">
-                    <h4 class="card-title">A simple website to import .xls and .xlsx and manage its data.</h4>
+                    <h4 class="card-title">A simple website to import .xls and .xlsx and manage their data.</h4>
                     <p class="card-text">
-                        <p>The Importer uses queue to handle big data imports so that it can track the importing progress.</p>
+                        <p>The Importer uses a queue to handle big data imports so that it can track the importing progress and manage the import process properly.</p>
                         <a href="{{ route('home') }}" class="btn btn-primary">Get Started</a>
                     </p>
                 </div>

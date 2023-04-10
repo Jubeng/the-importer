@@ -1,7 +1,7 @@
 # The Importer
 
-A simple website to import .xls and .xlsx and manage its data.
-The Importer uses queue to handle big data imports so that it can track the importing progress.
+A simple website to import .xls and .xlsx and manage their data.
+The Importer uses a queue to handle big data imports so that it can track the importing progress and manage the import process properly.
 
 Technical Analysis: https://docs.google.com/document/d/1104JKfRIUSEjgJQgRbyPDMb0cF6id-pOlfhDc13Dqic/edit?usp=sharing
 
