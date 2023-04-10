@@ -1,6 +1,10 @@
 $(document).ready(function() {
     let oProgress = {
         init: () => {
+            oProgress.cacheDOM();
+        },
+
+        cacheDOM: () => {
             oProgress.oModalBackDrop = $('#modalBackDrop');
             oProgress.oModalProgress = $('#staticBackdrop');
             oProgress.oModalProgressAnimation = $('#progressAnimation');
@@ -15,7 +19,7 @@ $(document).ready(function() {
                     if (oResponse.progress === undefined) {
                         return false;
                     }
-                    console.log(oResponse.progress);
+
                     if (oResponse.progress === false) {
                         return oResponse.progress;
                     }

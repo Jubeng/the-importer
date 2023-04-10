@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\ExportService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 /**
  * ExportController
@@ -37,12 +39,19 @@ class ExportController
      */
     public function exportData(Request $oRequest)
     {
-        $aParam = $oRequest->all();
-        $aParam['user_id'] = Auth::user()->id;
-        $aFileDetails = $this->oExportService->exportData($aParam);
+        try {
+            $aParam = $oRequest->all();
+            $aParam['user_id'] = Auth::user()->id;
+            $aFileDetails = $this->oExportService->exportData($aParam);
 
-        return response()->download($aFileDetails['file_name'], $aFileDetails['file_name'], [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ])->deleteFileAfterSend(true);
+            return response()->download($aFileDetails['file_name'], $aFileDetails['file_name'], [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])->deleteFileAfterSend(true);
+        } catch (Exception $oException) {
+            Log::error('Error occurred while exporting: ' . $oException->getMessage());
+            return redirect()->back()->withErrors([
+                'error' => 'Error occurred while exporting. Please try again.'
+            ]);
+        }
     }
 }

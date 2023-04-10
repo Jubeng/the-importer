@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -24,8 +25,8 @@ return new class extends Migration
             $table->string('contact_phone', 15)->nullable();
             $table->string('contact_mobile', 15);
             $table->string('email', 255)->unique();
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent();
+            $table->timestamp('created_at')->default(DB::raw('current_timestamp()'));
+            $table->timestamp('updated_at')->default(DB::raw('current_timestamp() ON UPDATE current_timestamp()'));
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

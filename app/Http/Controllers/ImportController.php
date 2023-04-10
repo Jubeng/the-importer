@@ -59,8 +59,11 @@ class ImportController extends Controller
             $aImportResponse = $this->oImportService->importFile([
                 'import_file' => $oFile
             ]);
-            session()->put('sCurrentBatchId', $aImportResponse['batch_id']);
 
+            if (gettype($aImportResponse) === 'array') {
+                session()->put('sCurrentBatchId', $aImportResponse['batch_id']);
+            }
+            
             return redirect('home');
         } catch (Exception $oException) {
             Log::error('Error occurred while importing: ' . $oException->getMessage());
