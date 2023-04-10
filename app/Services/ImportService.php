@@ -220,21 +220,29 @@ class ImportService extends BaseService
         Validator::extend('phone_number', function ($attribute, $value, $parameters, $validator) {
             return preg_match('/^\+?[\d ()\-\.]{7,15}$/', $value);
         });
+
         foreach ($aRowData as $aData) {
             $validator = Validator::make($aData, [
-                'first_name'       => 'required|string|min:2|max:50',
-                'last_name'        => 'required|string|min:2|max:50',
-                'middle_name'      => 'string|min:2|max:50',
-                'address_street'   => 'required|string|min:2|max:100',
-                'address_brgy'     => 'required|string|min:2|max:100',
-                'address_city'     => 'required|string|min:2|max:50',
-                'address_province' => 'required|string|min:2|max:50',
-                'contact_phone'    => 'phone_number|max:15',
+                'first_name'       => 'required|string|regex:/^[a-zA-Z\s\'.-]+$/|min:2|max:50',
+                'last_name'        => 'required|string|regex:/^[a-zA-Z\s\'.-]+$/|min:2|max:50',
+                'middle_name'      => 'sometimes|string|regex:/^[a-zA-Z\s\'.-]+$/|min:2|max:50',
+                'address_street'   => 'required|string|regex:/^[a-zA-Z0-9\s.-]+$/|min:2|max:100',
+                'address_brgy'     => 'required|string|regex:/^[a-zA-Z0-9\s.-]+$/|min:2|max:100',
+                'address_city'     => 'required|string|regex:/^[a-zA-Z\s.-]+$/|min:2|max:50',
+                'address_province' => 'required|string|regex:/^[a-zA-Z\s.-]+$/|min:2|max:50',
+                'contact_phone'    => 'sometimes|phone_number|max:15',
                 'contact_mobile'   => 'required|phone_number|min:9|max:15',
                 'email'            => 'required|email|max:255|unique:import',
             ],
             [
-                'contact_phone'    => 'The phone number field is not valid.',
+                'contact_phone'          => 'The phone number field is not valid.',
+                'first_name.regex'       => ':attribute only accepts letters, spaces, -, apostrophe, and period.',
+                'last_name.regex'        => ':attribute only accepts letters, spaces, -, apostrophe, and period.',
+                'middle_name.regex'      => ':attribute only accepts letters, spaces, -, apostrophe, and period.',
+                'address_street.regex'   => ':attribute only accepts letters, numbers, -, period and spaces.',
+                'address_brgy.regex'     => ':attribute only accepts letters, numbers, -, period and spaces.',
+                'address_city.regex'     => ':attribute only accepts letters, -, period and spaces.',
+                'address_province.regex' => ':attribute only accepts letters, -, period and spaces.',
             ],
             [
                 'first_name'       => 'first name',
