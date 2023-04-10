@@ -10,6 +10,21 @@
 @endphp
 <div class="container">
     <div id="modalBackDrop" class="modal-backdrop fade" style="display: none;"></div>
+    <div id="loader" class="mx-auto" style="
+        z-index: 1056;
+        position: fixed;
+        top: 48%;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        display: none;
+    ">
+        <div  class="text-center">
+            <div class="text-warning spinner-grow" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
     <!-- Modal -->
     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-modal="true" role="dialog">
         <div class="modal-dialog modal-dialog-centered">
@@ -26,7 +41,7 @@
                         </div>
                     
                         <div class="ms-3 lh-sm">
-                            Don't close your browser to keep track of your progress <br> and please wait before importing again.
+                            Don't close your browser to keep track of your progress and please wait before importing again.
                         </div>
                     </div>
                     <div id="progressAnimation" class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
@@ -74,7 +89,7 @@
                                             </div>
                                         </div>
                                         <div class="col-12">
-                                            <button type="submit" class="btn btn-primary"><i class='fas fa-upload' style='font-size:14px;color:white'></i> Import</button>
+                                            <button id="importButton" type="submit" class="btn btn-primary"><i class='fas fa-upload' style='font-size:14px;color:white'></i> Import</button>
                                         </div>
                                     </form>
                                 </div>
@@ -95,13 +110,13 @@
                                         <input type="hidden" name="page" value="1">
                                         <div class="d-flex flex-row">
                                             <div class="p-2">
-                                                <button type="submit" name="export_type" value="page" class="btn btn-primary">
+                                                <button type="submit" id="exportPageButton" name="export_type" value="page" class="btn btn-primary">
                                                     <i class='fas fa-download' style='font-size:14px;color:white'></i> 
                                                     Export Current Page
                                                 </button>
                                             </div>
                                             <div class="p-2">
-                                                <button type="submit" name="export_type" value="all" class="btn btn-primary">
+                                                <button type="submit" id="exportAllButton" name="export_type" value="all" class="btn btn-primary">
                                                     <i class='fas fa-download' style='font-size:14px;color:white'></i> 
                                                     Export All
                                                 </button>
@@ -125,7 +140,7 @@
                                         @csrf
                                         <input type="hidden" name="page" value="{{ $page }}">
                                         <input type="hidden" name="type" value="all">
-                                        <button type="submit" class="btn btn-danger">
+                                        <button id="deleteAllButton" type="submit" class="btn btn-danger">
                                             <i class='far fa-trash-alt' style='font-size:14px;color:white'></i> Delete all
                                         </button>
                                     </form>
@@ -133,7 +148,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="table-responsive-md mt-3">
+                    <div class="table-responsive mt-3">
                         <table class="table align-middle">
                             <thead class="thead ">
                                 <tr class="table-light">
@@ -222,5 +237,5 @@
 </div>
 @endsection
 @section('script')
-    @vite(['resources/js/checkProgress.js'])
+    @vite(['resources/js/checkProgress.js', 'resources/js/showLoader.js'])
 @endsection
